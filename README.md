@@ -1017,4 +1017,4 @@ to generate the documentation. The generated html sits in `target/doc/`. Alterna
 
 ## Conversation channels
 
-We're generally on [Discord](https://discord.gg/q3Sfzb8S2V).
+We're generally on [Discord](https://discord.gg/tari).
