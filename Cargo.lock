@@ -7115,7 +7115,6 @@ dependencies = [
  "hickory-client",
  "hickory-proto",
  "integer-encoding",
- "libsqlite3-sys",
  "lmdb-zero",
  "log",
  "log-mdc",
