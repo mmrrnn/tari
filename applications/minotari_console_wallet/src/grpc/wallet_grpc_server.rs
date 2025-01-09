@@ -88,7 +88,7 @@ use minotari_wallet::{
     output_manager_service::{handle::OutputManagerHandle, UtxoSelectionCriteria},
     transaction_service::{
         handle::TransactionServiceHandle,
-        storage::models::{self, CompletedTransaction, WalletTransaction},
+        storage::models::{self, WalletTransaction},
     },
     WalletSqlite,
 };
@@ -771,10 +771,7 @@ impl wallet_server::Wallet for WalletGrpcServer {
 
         let (mut sender, receiver) = mpsc::channel(transactions.len());
         task::spawn(async move {
-            let mut txns: Vec<&CompletedTransaction> = transactions.values().collect();
-            txns.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-
-            for (i, txn) in txns.iter().enumerate() {
+            for (i, (_, txn)) in transactions.iter().enumerate() {
                 let response = GetCompletedTransactionsResponse {
                     transaction: Some(TransactionInfo {
                         tx_id: txn.tx_id.into(),

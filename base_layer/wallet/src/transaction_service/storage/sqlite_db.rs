@@ -1726,7 +1726,9 @@ impl CompletedTransactionSql {
             query.filter(completed_transactions::cancelled.is_null())
         };
 
-        Ok(query.load::<CompletedTransactionSql>(conn)?)
+        Ok(query
+            .order_by(completed_transactions::mined_timestamp.desc())
+            .load::<CompletedTransactionSql>(conn)?)
     }
 
     pub fn index_by_status_and_cancelled(
