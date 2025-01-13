@@ -28,6 +28,7 @@ use std::{
 };
 
 use chrono::{DateTime, Utc};
+use indexmap::IndexMap;
 use tari_common_types::{
     burnt_proof::BurntProof,
     tari_address::TariAddress,
@@ -419,7 +420,7 @@ pub enum TransactionServiceResponse {
     TransactionCancelled,
     PendingInboundTransactions(HashMap<TxId, InboundTransaction>),
     PendingOutboundTransactions(HashMap<TxId, OutboundTransaction>),
-    CompletedTransactions(HashMap<TxId, CompletedTransaction>),
+    CompletedTransactions(IndexMap<TxId, CompletedTransaction>),
     CompletedTransaction(Box<CompletedTransaction>),
     BaseNodePublicKeySet,
     UtxoImported(TxId),
@@ -965,7 +966,7 @@ impl TransactionServiceHandle {
 
     pub async fn get_completed_transactions(
         &mut self,
-    ) -> Result<HashMap<TxId, CompletedTransaction>, TransactionServiceError> {
+    ) -> Result<IndexMap<TxId, CompletedTransaction>, TransactionServiceError> {
         match self
             .handle
             .call(TransactionServiceRequest::GetCompletedTransactions)
@@ -978,7 +979,7 @@ impl TransactionServiceHandle {
 
     pub async fn get_cancelled_completed_transactions(
         &mut self,
-    ) -> Result<HashMap<TxId, CompletedTransaction>, TransactionServiceError> {
+    ) -> Result<IndexMap<TxId, CompletedTransaction>, TransactionServiceError> {
         match self
             .handle
             .call(TransactionServiceRequest::GetCancelledCompletedTransactions)

@@ -48,6 +48,7 @@ use tari_utilities::{hex::Hex, ByteArray, Hidden};
 use thiserror::Error;
 use tokio::time::Instant;
 use zeroize::Zeroize;
+use indexmap::IndexMap;
 
 use crate::{
     schema::{completed_transactions, inbound_transactions, outbound_transactions},
@@ -288,7 +289,7 @@ impl TransactionBackend for TransactionServiceSqliteDatabase {
                 Some(DbValue::PendingInboundTransactions(result))
             },
             DbKey::CompletedTransactions => {
-                let mut result = HashMap::new();
+                let mut result = IndexMap::new();
                 for c in CompletedTransactionSql::index_by_cancelled(&mut conn, false)? {
                     result.insert(
                         (c.tx_id as u64).into(),
@@ -321,7 +322,7 @@ impl TransactionBackend for TransactionServiceSqliteDatabase {
                 Some(DbValue::PendingInboundTransactions(result))
             },
             DbKey::CancelledCompletedTransactions => {
-                let mut result = HashMap::new();
+                let mut result = IndexMap::new();
                 for c in CompletedTransactionSql::index_by_cancelled(&mut conn, true)? {
                     result.insert(
                         (c.tx_id as u64).into(),

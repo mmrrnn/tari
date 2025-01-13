@@ -7,6 +7,7 @@ version = "1.9.1-pre.2"
 edition = "2018"
 
 [dependencies]
+indexmap = "2.7.0"
 tari_common = { path = "../../common", version = "1.9.1-pre.2" }
 tari_common_sqlite = { path = "../../common_sqlite", version = "1.9.1-pre.2" }
 tari_common_types = { path = "../../base_layer/common_types", version = "1.9.1-pre.2" }

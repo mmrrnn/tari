@@ -28,6 +28,7 @@ use std::{
 };
 
 use chrono::{DateTime, Utc};
+use indexmap::IndexMap;
 use log::*;
 use tari_common_types::{
     tari_address::TariAddress,
@@ -247,7 +248,7 @@ pub enum DbValue {
     CompletedTransaction(Box<CompletedTransaction>),
     PendingOutboundTransactions(HashMap<TxId, OutboundTransaction>),
     PendingInboundTransactions(HashMap<TxId, InboundTransaction>),
-    CompletedTransactions(HashMap<TxId, CompletedTransaction>),
+    CompletedTransactions(IndexMap<TxId, CompletedTransaction>),
     WalletTransaction(Box<WalletTransaction>),
 }
 
@@ -588,13 +589,13 @@ where T: TransactionBackend + 'static
         Ok(address)
     }
 
-    pub fn get_completed_transactions(&self) -> Result<HashMap<TxId, CompletedTransaction>, TransactionStorageError> {
+    pub fn get_completed_transactions(&self) -> Result<IndexMap<TxId, CompletedTransaction>, TransactionStorageError> {
         self.get_completed_transactions_by_cancelled(false)
     }
 
     pub fn get_cancelled_completed_transactions(
         &self,
-    ) -> Result<HashMap<TxId, CompletedTransaction>, TransactionStorageError> {
+    ) -> Result<IndexMap<TxId, CompletedTransaction>, TransactionStorageError> {
         self.get_completed_transactions_by_cancelled(true)
     }
 
@@ -620,7 +621,7 @@ where T: TransactionBackend + 'static
     fn get_completed_transactions_by_cancelled(
         &self,
         cancelled: bool,
-    ) -> Result<HashMap<TxId, CompletedTransaction>, TransactionStorageError> {
+    ) -> Result<IndexMap<TxId, CompletedTransaction>, TransactionStorageError> {
         let key = if cancelled {
             DbKey::CancelledCompletedTransactions
         } else {
