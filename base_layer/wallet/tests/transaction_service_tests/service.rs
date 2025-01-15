@@ -3391,7 +3391,7 @@ async fn test_transaction_cancellation() {
         .await
         .unwrap();
 
-    assert!(alice_ts_interface
+    assert!(!alice_ts_interface
         .transaction_service_handle
         .get_pending_inbound_transactions()
         .await
