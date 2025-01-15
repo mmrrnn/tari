@@ -3308,8 +3308,7 @@ async fn test_transaction_cancellation() {
         .await
         .unwrap()
         .iter()
-        .find(|tx| tx.tx_id == tx_id)
-        .is_none());
+        .any(|tx| tx.tx_id == tx_id));
 
     let key_manager = create_memory_db_key_manager().unwrap();
     let input = create_wallet_output_with_data(
@@ -3398,8 +3397,7 @@ async fn test_transaction_cancellation() {
         .await
         .unwrap()
         .iter()
-        .find(|tx| tx.tx_id == tx_id2)
-        .is_none());
+        .any(|tx| tx.tx_id == tx_id2));
 
     // Lets cancel the last one using a Comms stack message
     let input = create_wallet_output_with_data(
@@ -3526,8 +3524,7 @@ async fn test_transaction_cancellation() {
         .await
         .unwrap()
         .iter()
-        .find(|tx| tx.tx_id == tx_id3)
-        .is_none());
+        .any(|tx| tx.tx_id == tx_id3));
 }
 #[tokio::test]
 async fn test_direct_vs_saf_send_of_tx_reply_and_finalize() {

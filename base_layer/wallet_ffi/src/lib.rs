@@ -7695,7 +7695,7 @@ pub unsafe extern "C" fn wallet_get_pending_inbound_transactions(
 
     match pending_transactions {
         Ok(pending_transactions) => {
-            for tx in pending_transactions.iter() {
+            for tx in &pending_transactions {
                 pending.push(tx.clone());
             }
 
@@ -7765,7 +7765,7 @@ pub unsafe extern "C" fn wallet_get_pending_outbound_transactions(
         .block_on((*wallet).wallet.transaction_service.get_pending_outbound_transactions());
     match pending_transactions {
         Ok(pending_transactions) => {
-            for tx in pending_transactions.iter() {
+            for tx in &pending_transactions {
                 pending.push(tx.clone());
             }
             if let Ok(completed_txs) = (*wallet)
@@ -7864,7 +7864,7 @@ pub unsafe extern "C" fn wallet_get_cancelled_transactions(
     };
 
     let mut completed = Vec::new();
-    for tx in completed_transactions.iter() {
+    for tx in &completed_transactions {
         completed.push(tx.clone());
     }
     let runtime = match Runtime::new() {
@@ -7883,12 +7883,12 @@ pub unsafe extern "C" fn wallet_get_cancelled_transactions(
             return ptr::null_mut();
         },
     };
-    for tx in inbound_transactions.iter() {
+    for tx in &inbound_transactions {
         let mut inbound_tx = CompletedTransaction::from(tx.clone());
         inbound_tx.destination_address = wallet_address.clone();
         completed.push(inbound_tx);
     }
-    for tx in outbound_transactions.iter() {
+    for tx in &outbound_transactions {
         let mut outbound_tx = CompletedTransaction::from(tx.clone());
         outbound_tx.source_address = wallet_address.clone();
         completed.push(outbound_tx);

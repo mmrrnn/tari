@@ -22,7 +22,6 @@
 
 use std::{
     convert::{TryFrom, TryInto},
-    ops::Deref,
     str::FromStr,
 };
 
