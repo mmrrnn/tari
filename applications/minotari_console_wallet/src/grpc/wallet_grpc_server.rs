@@ -22,6 +22,7 @@
 
 use std::{
     convert::{TryFrom, TryInto},
+    ops::Deref,
     str::FromStr,
 };
 
@@ -771,7 +772,7 @@ impl wallet_server::Wallet for WalletGrpcServer {
 
         let (mut sender, receiver) = mpsc::channel(transactions.len());
         task::spawn(async move {
-            for (i, (_, txn)) in transactions.iter().enumerate() {
+            for (i, txn) in transactions.iter().enumerate() {
                 let response = GetCompletedTransactionsResponse {
                     transaction: Some(TransactionInfo {
                         tx_id: txn.tx_id.into(),
@@ -1089,10 +1090,10 @@ async fn handle_pending_outbound(
     sender: &mut Sender<Result<TransactionEventResponse, Status>>,
 ) {
     match transaction_service.get_pending_outbound_transactions().await {
-        Ok(mut txs) => {
-            if let Some(tx) = txs.remove(&tx_id) {
+        Ok(txs) => {
+            if let Some(tx) = txs.iter().find(|tx| tx.tx_id == tx_id) {
                 let transaction_event =
-                    convert_to_transaction_event(event.to_string(), TransactionWrapper::Outbound(Box::new(tx)));
+                    convert_to_transaction_event(event.to_string(), TransactionWrapper::Outbound(Box::new(tx.clone())));
                 send_transaction_event(transaction_event, sender).await;
             } else {
                 error!(target: LOG_TARGET, "Not found in pending outbound set tx_id: {}", tx_id);

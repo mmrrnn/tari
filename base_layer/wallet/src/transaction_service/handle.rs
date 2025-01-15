@@ -911,7 +911,6 @@ impl TransactionServiceHandle {
         }
     }
 
-    ///////////////////////////////
     pub async fn get_pending_inbound_transactions(
         &mut self,
     ) -> Result<Vec<InboundTransaction>, TransactionServiceError> {
@@ -987,8 +986,6 @@ impl TransactionServiceHandle {
             _ => Err(TransactionServiceError::UnexpectedApiResponse),
         }
     }
-
-    ///////////////////////////
 
     pub async fn get_completed_transaction(
         &mut self,
