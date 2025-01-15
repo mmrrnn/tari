@@ -3302,7 +3302,7 @@ async fn test_transaction_cancellation() {
     let alice_cancel_message = try_decode_transaction_cancelled_message(call.1.to_vec()).unwrap();
     assert_eq!(alice_cancel_message.tx_id, tx_id.as_u64(), "SAF");
 
-    assert!(alice_ts_interface
+    assert!(!alice_ts_interface
         .transaction_service_handle
         .get_pending_outbound_transactions()
         .await
