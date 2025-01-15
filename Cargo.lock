@@ -4238,7 +4238,6 @@ dependencies = [
  "env_logger 0.7.1",
  "fs2",
  "futures 0.3.31",
- "indexmap 2.7.0",
  "itertools 0.10.5",
  "libsqlite3-sys",
  "log",

@@ -803,9 +803,10 @@ async fn large_interactive_transaction() {
                         // We want to ensure that we can get the pending outbound transaction from the database,
                         // and excercise the sender_protocol
                         let pending_outbound = alice_ts.get_pending_outbound_transactions().await.unwrap();
-                        pending_outbound.get(id).unwrap().sender_protocol.get_amount_to_recipient().unwrap();
+                        let po_tx = pending_outbound.iter().find(|tx| tx.tx_id == *id).unwrap();
+                        po_tx.sender_protocol.get_amount_to_recipient().unwrap();
                         assert_eq!(
-                            pending_outbound.get(id).unwrap().sender_protocol.get_amount_to_recipient().unwrap(),
+                            po_tx.sender_protocol.get_amount_to_recipient().unwrap(),
                             transaction_value
                         );
                     },
@@ -825,8 +826,9 @@ async fn large_interactive_transaction() {
                         // We want to ensure that we can get the pending inbound transaction from the database,
                         // and excercise the receiver_protocol
                         let pending_inbound = bob_ts.get_pending_inbound_transactions().await.unwrap();
-                        assert!(pending_inbound.get(id).unwrap().receiver_protocol.get_signed_data().is_ok());
-                        assert_eq!(pending_inbound.get(id).unwrap().amount, transaction_value);
+                        let pi_tx = pending_inbound.iter().find(|tx| tx.tx_id == *id).unwrap();
+                        assert!(pi_tx.receiver_protocol.get_signed_data().is_ok());
+                        assert_eq!(pi_tx.amount, transaction_value);
                     },
                     TransactionEvent::ReceivedFinalizedTransaction(id) => {
                         tx_id = *id;
@@ -1236,6 +1238,7 @@ async fn test_spend_dust_happy_path() {
 
 #[tokio::test]
 async fn single_transaction_to_self() {
+    // Question(B): Why stackoverflow?
     let network = Network::LocalNet;
     let consensus_manager = ConsensusManager::builder(network).build().unwrap();
     let factories = CryptoFactories::default();
@@ -3246,7 +3249,8 @@ async fn test_transaction_cancellation() {
             .get_pending_outbound_transactions()
             .await
             .unwrap()
-            .remove(&tx_id)
+            .iter()
+            .find(|tx| tx.tx_id == tx_id)
         {
             None => (),
             Some(_) => break,
@@ -3303,7 +3307,8 @@ async fn test_transaction_cancellation() {
         .get_pending_outbound_transactions()
         .await
         .unwrap()
-        .remove(&tx_id)
+        .iter()
+        .find(|tx| tx.tx_id == tx_id)
         .is_none());
 
     let key_manager = create_memory_db_key_manager().unwrap();
@@ -3373,13 +3378,13 @@ async fn test_transaction_cancellation() {
         }
     }
 
-    alice_ts_interface
+    assert!(alice_ts_interface
         .transaction_service_handle
         .get_pending_inbound_transactions()
         .await
         .unwrap()
-        .remove(&tx_id2)
-        .expect("Pending Transaction 2 should be in list");
+        .iter()
+        .any(|tx| tx.tx_id == tx_id2));
 
     alice_ts_interface
         .transaction_service_handle
@@ -3392,7 +3397,8 @@ async fn test_transaction_cancellation() {
         .get_pending_inbound_transactions()
         .await
         .unwrap()
-        .remove(&tx_id2)
+        .iter()
+        .find(|tx| tx.tx_id == tx_id2)
         .is_none());
 
     // Lets cancel the last one using a Comms stack message
@@ -3460,13 +3466,13 @@ async fn test_transaction_cancellation() {
         }
     }
 
-    alice_ts_interface
+    assert!(alice_ts_interface
         .transaction_service_handle
         .get_pending_inbound_transactions()
         .await
         .unwrap()
-        .remove(&tx_id3)
-        .expect("Pending Transaction 3 should be in list");
+        .iter()
+        .any(|tx| tx.tx_id == tx_id3));
 
     let proto_message = proto::TransactionCancelledMessage { tx_id: tx_id3.as_u64() };
     // Sent from the wrong source address so should not cancel
@@ -3481,13 +3487,13 @@ async fn test_transaction_cancellation() {
 
     sleep(Duration::from_secs(5)).await;
 
-    alice_ts_interface
+    assert!(alice_ts_interface
         .transaction_service_handle
         .get_pending_inbound_transactions()
         .await
         .unwrap()
-        .remove(&tx_id3)
-        .expect("Pending Transaction 3 should be in list");
+        .iter()
+        .any(|tx| tx.tx_id == tx_id3));
 
     let proto_message = proto::TransactionCancelledMessage { tx_id: tx_id3.as_u64() };
     alice_ts_interface
@@ -3519,7 +3525,8 @@ async fn test_transaction_cancellation() {
         .get_pending_inbound_transactions()
         .await
         .unwrap()
-        .remove(&tx_id3)
+        .iter()
+        .find(|tx| tx.tx_id == tx_id3)
         .is_none());
 }
 #[tokio::test]
@@ -5531,12 +5538,14 @@ async fn transaction_service_tx_broadcast() {
     }
     assert!(tx1_received);
 
-    let alice_completed_tx1 = alice_ts_interface
+    let alice_completed_txs = alice_ts_interface
         .transaction_service_handle
         .get_completed_transactions()
         .await
-        .unwrap()
-        .remove(&tx_id1)
+        .unwrap();
+    let alice_completed_tx1 = alice_completed_txs
+        .iter()
+        .find(|tx| tx.tx_id == tx_id1)
         .expect("Transaction must be in collection");
 
     let tx1_fee = alice_completed_tx1.fee;
@@ -5637,12 +5646,14 @@ async fn transaction_service_tx_broadcast() {
             mined_timestamp: None,
         });
 
-    let alice_completed_tx2 = alice_ts_interface
+    let alice_completed_txs = alice_ts_interface
         .transaction_service_handle
         .get_completed_transactions()
         .await
-        .unwrap()
-        .remove(&tx_id2)
+        .unwrap();
+    let alice_completed_tx2 = alice_completed_txs
+        .iter()
+        .find(|tx| tx.tx_id == tx_id2)
         .expect("Transaction must be in collection");
 
     assert!(
