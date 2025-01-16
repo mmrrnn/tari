@@ -3518,7 +3518,7 @@ async fn test_transaction_cancellation() {
     }
     assert!(cancelled, "Should received cancelled event");
 
-    assert!(alice_ts_interface
+    assert!(!alice_ts_interface
         .transaction_service_handle
         .get_pending_inbound_transactions()
         .await
