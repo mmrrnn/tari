@@ -6242,9 +6242,9 @@ async fn test_completed_transactions_ordering() {
     );
 
     for i in 1u32..5u32 {
-        let random_timestamp = OsRng.next_u32() as i64;
+        let random_timestamp = i64::from(OsRng.next_u32());
         let completed_tx = CompletedTransaction {
-            tx_id: (i as u64).into(),
+            tx_id: u64::from(i).into(),
             source_address: source_address.clone(),
             destination_address: destination_address.clone(),
             amount: MicroMinotari::from(1000),
@@ -6266,7 +6266,7 @@ async fn test_completed_transactions_ordering() {
 
         tx_backend
             .write(WriteOperation::Insert(DbKeyValuePair::CompletedTransaction(
-                (i as u64).into(),
+                u64::from(i).into(),
                 Box::new(completed_tx),
             )))
             .unwrap();
