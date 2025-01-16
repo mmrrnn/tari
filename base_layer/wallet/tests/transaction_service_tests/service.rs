@@ -1238,7 +1238,6 @@ async fn test_spend_dust_happy_path() {
 
 #[tokio::test]
 async fn single_transaction_to_self() {
-    // Question(B): Why stackoverflow?
     let network = Network::LocalNet;
     let consensus_manager = ConsensusManager::builder(network).build().unwrap();
     let factories = CryptoFactories::default();
