@@ -1173,7 +1173,6 @@ impl InboundTransactionSql {
     ) -> Result<Vec<InboundTransactionSql>, TransactionStorageError> {
         Ok(inbound_transactions::table
             .filter(inbound_transactions::cancelled.eq(i32::from(cancelled)))
-            // QUESTION(A): Should we order by timestamp or last_send_timestamp?
             .order_by(inbound_transactions::timestamp.desc())
             .load::<InboundTransactionSql>(conn)?)
     }
@@ -1439,7 +1438,6 @@ impl OutboundTransactionSql {
     ) -> Result<Vec<OutboundTransactionSql>, TransactionStorageError> {
         Ok(outbound_transactions::table
             .filter(outbound_transactions::cancelled.eq(i32::from(cancelled)))
-            // QUESTION(A): Should we order by timestamp or last_send_timestamp?
             .order_by(outbound_transactions::timestamp.desc())
             .load::<OutboundTransactionSql>(conn)?)
     }

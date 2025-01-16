@@ -734,7 +734,6 @@ impl AppStateInner {
                 .map(|t| CompletedTransaction::from(t.clone()))
                 .collect::<Vec<CompletedTransaction>>(),
         );
-        // Question(C): We sort txs by mined_timestamp in sql, here is by timestamp
         pending_transactions.sort_by(|a: &CompletedTransaction, b: &CompletedTransaction| {
             b.timestamp.partial_cmp(&a.timestamp).unwrap()
         });
@@ -755,7 +754,6 @@ impl AppStateInner {
                 .get_cancelled_completed_transactions()
                 .await?,
         );
-        // Question(C): We sort txs by mined_timestamp in sql, here is by timestamp
         completed_transactions.sort_by(|a, b| {
             b.timestamp
                 .partial_cmp(&a.timestamp)
