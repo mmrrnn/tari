@@ -30,7 +30,7 @@ use std::{
 
 use blake2::Blake2b;
 use chacha20poly1305::{Key, KeyInit, XChaCha20Poly1305};
-use chrono::{Duration as ChronoDuration, Utc};
+use chrono::{DateTime, Duration as ChronoDuration, Utc};
 use digest::consts::U32;
 use futures::{
     channel::{mpsc, mpsc::Sender},
@@ -6209,4 +6209,88 @@ async fn test_get_fee_per_gram_per_block_basic() {
         .unwrap();
     assert_eq!(estimates.stats, stats.into_iter().map(Into::into).collect::<Vec<_>>());
     assert_eq!(estimates.stats.len(), 1)
+}
+
+#[tokio::test]
+async fn test_completed_transactions_ordering() {
+    let factories = CryptoFactories::default();
+    let connection = make_wallet_database_memory_connection();
+
+    let mut alice_ts_interface = setup_transaction_service_no_comms(factories.clone(), connection, None).await;
+    let tx_backend = alice_ts_interface.ts_db;
+
+    let kernel = KernelBuilder::new()
+        .with_excess(&factories.commitment.zero())
+        .with_signature(Signature::default())
+        .build()
+        .unwrap();
+    let tx = Transaction::new(
+        vec![],
+        vec![],
+        vec![kernel],
+        PrivateKey::random(&mut OsRng),
+        PrivateKey::random(&mut OsRng),
+    );
+    let source_address = TariAddress::new_dual_address_with_default_features(
+        PublicKey::from_secret_key(&PrivateKey::random(&mut OsRng)),
+        PublicKey::from_secret_key(&PrivateKey::random(&mut OsRng)),
+        Network::LocalNet,
+    );
+    let destination_address = TariAddress::new_dual_address_with_default_features(
+        PublicKey::from_secret_key(&PrivateKey::random(&mut OsRng)),
+        PublicKey::from_secret_key(&PrivateKey::random(&mut OsRng)),
+        Network::LocalNet,
+    );
+
+    for i in 1u32..5u32 {
+        let random_timestamp = OsRng.next_u32() as i64;
+        let completed_tx = CompletedTransaction {
+            tx_id: (i as u64).into(),
+            source_address: source_address.clone(),
+            destination_address: destination_address.clone(),
+            amount: MicroMinotari::from(1000),
+            fee: MicroMinotari::from(100),
+            transaction: tx.clone(),
+            status: TransactionStatus::Completed,
+            timestamp: DateTime::<Utc>::from_timestamp(random_timestamp, 0).unwrap(),
+            cancelled: None,
+            direction: TransactionDirection::Outbound,
+            send_count: 0,
+            last_send_timestamp: None,
+            transaction_signature: tx.first_kernel_excess_sig().unwrap_or(&Signature::default()).clone(),
+            confirmations: None,
+            mined_height: None,
+            mined_in_block: None,
+            mined_timestamp: DateTime::<Utc>::from_timestamp(random_timestamp + 100i64, 0),
+            payment_id: PaymentId::open_from_str("Yo!"),
+        };
+
+        tx_backend
+            .write(WriteOperation::Insert(DbKeyValuePair::CompletedTransaction(
+                (i as u64).into(),
+                Box::new(completed_tx),
+            )))
+            .unwrap();
+    }
+
+    let alice_completed_transactions = alice_ts_interface
+        .transaction_service_handle
+        .get_completed_transactions()
+        .await
+        .unwrap();
+
+    let mut mined_timestamps: Vec<_> = alice_completed_transactions
+        .iter()
+        .map(|tx| tx.mined_timestamp.unwrap_or_default())
+        .collect();
+    mined_timestamps.sort_by(|a, b| b.cmp(a));
+
+    assert_eq!(alice_completed_transactions.len(), 4);
+    assert_eq!(
+        alice_completed_transactions
+            .iter()
+            .map(|tx| tx.mined_timestamp.unwrap_or_default())
+            .collect::<Vec<_>>(),
+        mined_timestamps
+    );
 }
