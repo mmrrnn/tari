@@ -130,7 +130,7 @@ use tari_core::{
         tari_amount::*,
         test_helpers::{create_wallet_output_with_data, TestParams},
         transaction_components::{
-            encrypted_data::PaymentId,
+            encrypted_data::{PaymentId, TxType},
             KernelBuilder,
             OutputFeatures,
             RangeProofType,
@@ -626,7 +626,7 @@ async fn manage_single_transaction() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(4),
-            PaymentId::open_from_str("TAKE MAH MONEYS!"),
+            PaymentId::open("TAKE MAH MONEYS!", TxType::PaymentToOther),
         )
         .await
         .expect("Alice sending tx");
@@ -783,7 +783,7 @@ async fn large_interactive_transaction() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(1),
-            PaymentId::open_from_str("TAKE MAH MONEYS!"),
+            PaymentId::open("TAKE MAH MONEYS!", TxType::PaymentToOther),
         )
         .await
         .expect("Alice sending large tx");
@@ -946,7 +946,7 @@ async fn test_spend_dust_to_self_in_oversized_transaction() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             fee_per_gram,
-            PaymentId::open_from_str("TAKE MAH _OWN_ MONEYS!"),
+            PaymentId::open("TAKE MAH _OWN_ MONEYS!", TxType::PaymentToOther),
         )
         .await
         .is_err());
@@ -1043,7 +1043,7 @@ async fn test_spend_dust_to_other_in_oversized_transaction() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             fee_per_gram,
-            PaymentId::open_from_str("GIVE MAH _OWN_ MONEYS AWAY!"),
+            PaymentId::open("GIVE MAH _OWN_ MONEYS AWAY!", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -1158,7 +1158,7 @@ async fn test_spend_dust_happy_path() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             fee_per_gram,
-            PaymentId::open_from_str("TAKE MAH _OWN_ MONEYS!"),
+            PaymentId::open("TAKE MAH _OWN_ MONEYS!", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -1202,7 +1202,7 @@ async fn test_spend_dust_happy_path() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             fee_per_gram,
-            PaymentId::open_from_str("GIVE MAH _OWN_ MONEYS AWAY!"),
+            PaymentId::open("GIVE MAH _OWN_ MONEYS AWAY!", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -1302,7 +1302,7 @@ async fn single_transaction_to_self() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             20.into(),
-            PaymentId::open_from_str("TAKE MAH _OWN_ MONEYS!"),
+            PaymentId::open("TAKE MAH _OWN_ MONEYS!", TxType::PaymentToOther),
         )
         .await
         .expect("Alice sending tx");
@@ -1391,7 +1391,7 @@ async fn large_coin_split_transaction() {
             tx_id,
             coin_split_tx,
             amount,
-            PaymentId::open_from_str("large coin-split"),
+            PaymentId::open("large coin-split", TxType::CoinSplit),
         )
         .await
         .expect("Alice sending coin-split tx");
@@ -1632,7 +1632,7 @@ async fn send_one_sided_transaction_to_other() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             20.into(),
-            PaymentId::open_from_str("SEE IF YOU CAN CATCH THIS ONE..... SIDED TX!"),
+            PaymentId::open("SEE IF YOU CAN CATCH THIS ONE..... SIDED TX!", TxType::PaymentToOther),
         )
         .await
         .expect("Alice sending one-sided tx to Bob");
@@ -2251,7 +2251,7 @@ async fn manage_multiple_transactions() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(20),
-            PaymentId::open_from_str("a to b 1"),
+            PaymentId::open("a to b 1", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -2268,7 +2268,7 @@ async fn manage_multiple_transactions() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(20),
-            PaymentId::open_from_str("a to c 1"),
+            PaymentId::open("a to c 1", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -2287,7 +2287,7 @@ async fn manage_multiple_transactions() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(20),
-            PaymentId::open_from_str("b to a 1"),
+            PaymentId::open("b to a 1", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -2298,7 +2298,7 @@ async fn manage_multiple_transactions() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(20),
-            PaymentId::open_from_str("a to b 2"),
+            PaymentId::open("a to b 2", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -2876,7 +2876,7 @@ async fn discovery_async_return_test() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(20),
-            PaymentId::open_from_str("Discovery Tx!"),
+            PaymentId::open("Discovery Tx!", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -2915,7 +2915,7 @@ async fn discovery_async_return_test() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             MicroMinotari::from(20),
-            PaymentId::open_from_str("Discovery Tx2!"),
+            PaymentId::open("Discovery Tx2!", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -3016,7 +3016,7 @@ async fn test_power_mode_updates() {
         mined_height: None,
         mined_in_block: None,
         mined_timestamp: None,
-        payment_id: PaymentId::open_from_str("Yo!"),
+        payment_id: PaymentId::open("Yo!", TxType::PaymentToOther),
     };
 
     let source_address = TariAddress::new_dual_address_with_default_features(
@@ -3047,7 +3047,7 @@ async fn test_power_mode_updates() {
         mined_height: None,
         mined_in_block: None,
         mined_timestamp: None,
-        payment_id: PaymentId::open_from_str("Yo!"),
+        payment_id: PaymentId::open("Yo!", TxType::PaymentToOther),
     };
 
     tx_backend
@@ -3221,7 +3221,7 @@ async fn test_transaction_cancellation() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -3328,7 +3328,7 @@ async fn test_transaction_cancellation() {
     builder
         .with_lock_height(0)
         .with_fee_per_gram(MicroMinotari::from(5))
-        .with_payment_id(PaymentId::open_from_str("Yo!"))
+        .with_payment_id(PaymentId::open("Yo!", TxType::PaymentToOther))
         .with_input(input)
         .await
         .unwrap()
@@ -3415,7 +3415,7 @@ async fn test_transaction_cancellation() {
     builder
         .with_lock_height(0)
         .with_fee_per_gram(MicroMinotari::from(5))
-        .with_payment_id(PaymentId::open_from_str("Yo!"))
+        .with_payment_id(PaymentId::open("Yo!", TxType::PaymentToOther))
         .with_input(input)
         .await
         .unwrap()
@@ -3572,7 +3572,7 @@ async fn test_direct_vs_saf_send_of_tx_reply_and_finalize() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -3774,7 +3774,7 @@ async fn test_direct_vs_saf_send_of_tx_reply_and_finalize() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -3963,7 +3963,7 @@ async fn test_tx_direct_send_behaviour() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message1"),
+            PaymentId::open("Testing Message1", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -4007,7 +4007,7 @@ async fn test_tx_direct_send_behaviour() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message2"),
+            PaymentId::open("Testing Message2", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -4056,7 +4056,7 @@ async fn test_tx_direct_send_behaviour() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message3"),
+            PaymentId::open("Testing Message3", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -4105,7 +4105,7 @@ async fn test_tx_direct_send_behaviour() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message4"),
+            PaymentId::open("Testing Message4", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -4432,7 +4432,7 @@ async fn test_transaction_resending() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -4620,7 +4620,7 @@ async fn test_resend_on_startup() {
     builder
         .with_lock_height(0)
         .with_fee_per_gram(MicroMinotari::from(177 / 5))
-        .with_payment_id(PaymentId::open_from_str("Yo!"))
+        .with_payment_id(PaymentId::open("Yo!", TxType::PaymentToOther))
         .with_input(input)
         .await
         .unwrap()
@@ -4660,7 +4660,7 @@ async fn test_resend_on_startup() {
         fee: stp.get_fee_amount().unwrap(),
         sender_protocol: stp,
         status: TransactionStatus::Pending,
-        payment_id: PaymentId::open_from_str("Yo!"),
+        payment_id: PaymentId::open("Yo!", TxType::PaymentToOther),
         timestamp: Utc::now(),
         cancelled: false,
         direct_send_success: false,
@@ -4793,7 +4793,7 @@ async fn test_resend_on_startup() {
         amount,
         receiver_protocol: rtp,
         status: TransactionStatus::Pending,
-        payment_id: PaymentId::open_from_str("Yo2"),
+        payment_id: PaymentId::open("Yo2", TxType::PaymentToOther),
         timestamp: Utc::now(),
         cancelled: false,
         direct_send_success: false,
@@ -4955,7 +4955,7 @@ async fn test_replying_to_cancelled_tx() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -5095,7 +5095,7 @@ async fn test_transaction_timeout_cancellation() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             20 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -5150,7 +5150,7 @@ async fn test_transaction_timeout_cancellation() {
     builder
         .with_lock_height(0)
         .with_fee_per_gram(MicroMinotari::from(177 / 5))
-        .with_payment_id(PaymentId::open_from_str("Yo!"))
+        .with_payment_id(PaymentId::open("Yo!", TxType::PaymentToOther))
         .with_input(input)
         .await
         .unwrap()
@@ -5190,7 +5190,7 @@ async fn test_transaction_timeout_cancellation() {
         fee: stp.get_fee_amount().unwrap(),
         sender_protocol: stp,
         status: TransactionStatus::Pending,
-        payment_id: PaymentId::open_from_str("Yo!"),
+        payment_id: PaymentId::open("Yo!", TxType::PaymentToOther),
         timestamp: Utc::now().checked_sub_signed(ChronoDuration::seconds(20)).unwrap(),
         cancelled: false,
         direct_send_success: false,
@@ -5390,7 +5390,7 @@ async fn transaction_service_tx_broadcast() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             100 * uT,
-            PaymentId::open_from_str("Testing Message"),
+            PaymentId::open("Testing Message", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -5451,7 +5451,7 @@ async fn transaction_service_tx_broadcast() {
             UtxoSelectionCriteria::default(),
             OutputFeatures::default(),
             20 * uT,
-            PaymentId::open_from_str("Testing Message2"),
+            PaymentId::open("Testing Message2", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -5746,7 +5746,7 @@ async fn broadcast_all_completed_transactions_on_startup() {
         mined_height: None,
         mined_in_block: None,
         mined_timestamp: None,
-        payment_id: PaymentId::open_from_str("Yo!"),
+        payment_id: PaymentId::open("Yo!", TxType::PaymentToOther),
     };
 
     let completed_tx2 = CompletedTransaction {
@@ -5884,7 +5884,7 @@ async fn test_update_faux_tx_on_oms_validation() {
             uo_1.to_transaction_output(&alice_ts_interface.key_manager_handle)
                 .await
                 .unwrap(),
-            PaymentId::open_from_str("blah"),
+            PaymentId::open("blah", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -5900,7 +5900,7 @@ async fn test_update_faux_tx_on_oms_validation() {
             uo_2.to_transaction_output(&alice_ts_interface.key_manager_handle)
                 .await
                 .unwrap(),
-            PaymentId::open_from_str("one-sided 1"),
+            PaymentId::open("one-sided 1", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -5916,7 +5916,7 @@ async fn test_update_faux_tx_on_oms_validation() {
             uo_3.to_transaction_output(&alice_ts_interface.key_manager_handle)
                 .await
                 .unwrap(),
-            PaymentId::open_from_str("one-sided 2"),
+            PaymentId::open("one-sided 2", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -6059,7 +6059,7 @@ async fn test_update_coinbase_tx_on_oms_validation() {
             uo_1.to_transaction_output(&alice_ts_interface.key_manager_handle)
                 .await
                 .unwrap(),
-            PaymentId::open_from_str("coinbase_confirmed"),
+            PaymentId::open("coinbase_confirmed", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -6075,7 +6075,7 @@ async fn test_update_coinbase_tx_on_oms_validation() {
             uo_2.to_transaction_output(&alice_ts_interface.key_manager_handle)
                 .await
                 .unwrap(),
-            PaymentId::open_from_str("one-coinbase_unconfirmed 1"),
+            PaymentId::open("one-coinbase_unconfirmed 1", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -6091,7 +6091,7 @@ async fn test_update_coinbase_tx_on_oms_validation() {
             uo_3.to_transaction_output(&alice_ts_interface.key_manager_handle)
                 .await
                 .unwrap(),
-            PaymentId::open_from_str("Coinbase_not_mined"),
+            PaymentId::open("Coinbase_not_mined", TxType::PaymentToOther),
         )
         .await
         .unwrap();
@@ -6261,7 +6261,7 @@ async fn test_completed_transactions_ordering() {
             mined_height: None,
             mined_in_block: None,
             mined_timestamp: DateTime::<Utc>::from_timestamp(random_timestamp + 100i64, 0),
-            payment_id: PaymentId::open_from_str("Yo!"),
+            payment_id: PaymentId::open("Yo!", TxType::PaymentToOther),
         };
 
         tx_backend
